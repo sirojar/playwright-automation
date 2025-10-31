@@ -12,5 +12,13 @@
     "class": ".input-password",
     "dataTest": "[data-test='password']",
     "xpath": "//input[@name='password']"
+  },
+  "login_button": {
+    "id": "login-button",
+    "css": "#login-button",
+    "class": ".submit-button",
+    "dataTest": "[data-test='login-button']",
+    "xpath": "//input[@id='login-button']"
   }
+  
 }
