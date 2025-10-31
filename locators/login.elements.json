@@ -1,0 +1,16 @@
+{
+  "username_field": {
+    "id": "user-name",
+    "css": "#user-name",
+    "class": ".input-username",
+    "dataTest": "[data-test='usernamwe']",
+    "xpath": "//input[@name='username']"
+  },
+  "password_field": {
+    "id": "password",
+    "css": "#password",
+    "class": ".input-password",
+    "dataTest": "[data-test='password']",
+    "xpath": "//input[@name='password']"
+  }
+}
