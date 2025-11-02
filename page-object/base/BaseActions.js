@@ -1,86 +1,29 @@
-import { getLocator } from "../../utils/element-locator-reader.js";
+import { ElementLocatorReader } from "../../utils/element-locator-reader.js";
+import { WaitStrategy } from "../../utils/wait-strategy.js";
 
-export class BaseActions {
-  constructor(page) {
-    this.page = page;
+export class BaseActions extends ElementLocatorReader {
+  constructor(page, elementsPath) {
+    super(page, elementsPath);
+    this.waitStrategy = new WaitStrategy(page, elementsPath);
   }
 
-  /**
-   * Private helper to get locator.
-   * @param {string} element - key from JSON locator file
-   */
-  async #get(element) {
-    return await getLocator(this.page, element);
-  }
-
-  /**
-   * Private helper to wait for element to reach a given state before interacting.
-   * @param {string} element
-   * @param {string} [state='visible'] - 'visible', 'attached', 'detached', 'hidden'
-   * @param {number} [timeout=5000]
-   */
-  async #waitFor(element, state = "visible", timeout = 5000) {
-    const locator = await this.#get(element);
-    await locator.waitFor({ state, timeout });
-    return locator;
-  }
-
-  /**
-   * Click on element after waiting for visibility.
-   */
-  async click(element, options = {}) {
-    const locator = await this.#waitFor(
-      element,
-      options.state || "visible",
-      options.timeout || 5000
-    );
+  async click(element, timeout) {
+    const locator = await this.waitStrategy.waitForVisible(element, timeout);
     await locator.click();
   }
 
-  /**
-   * Scroll to element after waiting for visibility.
-   */
-  async scroll(element, options = {}) {
-    const locator = await this.#waitFor(
-      element,
-      options.state || "visible",
-      options.timeout || 5000
-    );
+  async scroll(element, timeout) {
+    const locator = await this.waitStrategy.waitForVisible(element, timeout);
     await locator.scrollIntoViewIfNeeded();
   }
 
-  /**
-   * Get text content after waiting for visibility.
-   */
-  async getText(element, options = {}) {
-    const locator = await this.#waitFor(
-      element,
-      options.state || "visible",
-      options.timeout || 5000
-    );
-    const text = await locator.textContent();
-    return text
+  async getText(element, timeout) {
+    const locator = await this.waitStrategy.waitForVisible(element, timeout);
+    return await locator.textContent();
   }
 
-  /**
-   * Type text into field after waiting for visibility.
-   */
-  async inputValue(element, value, options = {}) {
-    const locator = await this.#waitFor(
-      element,
-      options.state || "visible",
-      options.timeout || 5000
-    );
+  async inputValue(element, value, timeout) {
+    const locator = await this.waitStrategy.waitForVisible(element, timeout);
     await locator.fill(value);
-  }
-
-  /**
-   * Wait (pause) for a specific number of milliseconds.
-   * Example: await this.wait(2000) → waits for 2 seconds.
-   * @param {number} ms - milliseconds to wait
-   */
-  async wait(ms = 1000) {
-    console.log(`⏸️ Waiting for ${ms} ms...`);
-    await this.page.waitForTimeout(ms); // ✅ built-in Playwright wait
   }
 }

@@ -1,41 +1,40 @@
 import { readFileSync } from "fs";
 
-const elements = JSON.parse(
-  readFileSync("./locators/login.elements.json", "utf-8")
-);
+export class ElementLocatorReader {
+  constructor(page, elementsPath = "./locators/login.elements.json") {
+    this.page = page;
+    this.elements = JSON.parse(readFileSync(elementsPath, "utf-8"));
+  }
 
-const selectorPriority = ["id", "dataTest", "css", "class", "xpath"];
+  async getLocator(name) {
+    const el = this.elements[name];
+    if (!el) throw new Error(`Element "${name}" not found in elements.json`);
 
-export async function getLocator(page, name) {
-  // console.log(elements)
-  const el = elements[name];
-  if (!el) throw new Error(`Element "${name}" not found in elements.json`);
+    const selectorPriority = [ "dataTest", "id", "css", "class", "xpath"];
 
-  for (const key of selectorPriority) {
-    const selector = el[key];
-    if (!selector) continue;
+    for (const key of selectorPriority) {
+      const selector = el[key];
+      if (!selector) continue;
 
-    console.log(`🔎 Trying selector type: ${key} → ${selector}`);
+      console.log(`🔎 Trying selector type: ${key} → ${selector}`);
 
-    const locator = page.locator(selector);
+      const locator = this.page.locator(selector);
+      const count = await locator.count();
 
-    // Check if element exists before waiting
-    const count = await locator.count();
-    if (count === 0) {
-      console.log(`❌ No elements found for ${key}, trying next...`);
-      continue; // ✅ go to next selector immediately
+      if (count === 0) {
+        console.log(`❌ No elements found for ${key}, trying next...`);
+        continue;
+      }
+
+      try {
+        await locator.first().waitFor({ state: "visible", timeout: 1000 });
+        console.log(`✅ Found visible element using ${key}`);
+        return locator.first();
+      } catch {
+        console.log(`⚠️ Element found but not visible with ${key}, trying next...`);
+      }
     }
 
-    // If element exists, wait briefly for visibility
-    try {
-      await locator.first().waitFor({ state: "visible", timeout: 1000 });
-      console.log(`✅ Found visible element using ${key}`);
-      return locator.first();
-    } catch {
-      console.log(
-        `⚠️ Element found but not visible with ${key}, trying next...`
-      );
-      continue;
-    }
+    throw new Error(`❌ No valid locator found for element "${name}"`);
   }
 }
