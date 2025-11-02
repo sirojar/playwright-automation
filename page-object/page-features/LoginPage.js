@@ -20,7 +20,6 @@ export class LoginPage extends BaseActions {
 
   async clickLogin() {
     await this.click("login_button");
-    await this.wait(1500);
   }
 
   async getText() {
