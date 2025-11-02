@@ -19,6 +19,8 @@
     "class": ".submit-button",
     "dataTest": "[data-test='login-button']",
     "xpath": "//input[@id='login-button']"
+  },
+  "error_message":{
+    "dataTest": "[data-test='error']"
   }
-  
 }

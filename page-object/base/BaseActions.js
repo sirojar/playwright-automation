@@ -19,7 +19,7 @@ export class BaseActions {
    * @param {string} [state='visible'] - 'visible', 'attached', 'detached', 'hidden'
    * @param {number} [timeout=5000]
    */
-  async #waitFor(element, state = 'visible', timeout = 5000) {
+  async #waitFor(element, state = "visible", timeout = 5000) {
     const locator = await this.#get(element);
     await locator.waitFor({ state, timeout });
     return locator;
@@ -29,7 +29,11 @@ export class BaseActions {
    * Click on element after waiting for visibility.
    */
   async click(element, options = {}) {
-    const locator = await this.#waitFor(element, options.state || 'visible', options.timeout || 5000);
+    const locator = await this.#waitFor(
+      element,
+      options.state || "visible",
+      options.timeout || 5000
+    );
     await locator.click();
   }
 
@@ -37,7 +41,11 @@ export class BaseActions {
    * Scroll to element after waiting for visibility.
    */
   async scroll(element, options = {}) {
-    const locator = await this.#waitFor(element, options.state || 'visible', options.timeout || 5000);
+    const locator = await this.#waitFor(
+      element,
+      options.state || "visible",
+      options.timeout || 5000
+    );
     await locator.scrollIntoViewIfNeeded();
   }
 
@@ -45,15 +53,34 @@ export class BaseActions {
    * Get text content after waiting for visibility.
    */
   async getText(element, options = {}) {
-    const locator = await this.#waitFor(element, options.state || 'visible', options.timeout || 5000);
-    return await locator.textContent();
+    const locator = await this.#waitFor(
+      element,
+      options.state || "visible",
+      options.timeout || 5000
+    );
+    const text = await locator.textContent();
+    return text
   }
 
   /**
    * Type text into field after waiting for visibility.
    */
   async inputValue(element, value, options = {}) {
-    const locator = await this.#waitFor(element, options.state || 'visible', options.timeout || 5000);
+    const locator = await this.#waitFor(
+      element,
+      options.state || "visible",
+      options.timeout || 5000
+    );
     await locator.fill(value);
+  }
+
+  /**
+   * Wait (pause) for a specific number of milliseconds.
+   * Example: await this.wait(2000) → waits for 2 seconds.
+   * @param {number} ms - milliseconds to wait
+   */
+  async wait(ms = 1000) {
+    console.log(`⏸️ Waiting for ${ms} ms...`);
+    await this.page.waitForTimeout(ms); // ✅ built-in Playwright wait
   }
 }
