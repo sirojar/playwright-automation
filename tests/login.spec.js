@@ -8,7 +8,6 @@ test("User can log in successfully @login", async ({ page }) => {
   await loginPage.enterUsername("standard_user");
   await loginPage.enterPassword("secret_sauce");
   await loginPage.clickLogin();
-  // await loginPage.getText();
-
+  
   await expect(page).toHaveTitle('Swag Labs');
 });
